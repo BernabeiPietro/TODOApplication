@@ -2,4 +2,4 @@ FROM openjdk:8
 ARG jarToCopy
 COPY /target/$jarToCopy /app/app.jar
 
-CMD ["java", "-cp", "/app/app.jar","/BOOT-INF/classes/com/examples/todoapp/TodoApplication"]
+CMD ["java", "-jar", "/app/app.jar"]

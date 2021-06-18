@@ -246,9 +246,17 @@
 										</args>
 									</build>
 									<run>
-										<ports>
-											<port>9090:8080</port>
-										</ports>
+										<network>
+											<mode>custom</mode>
+											<name>my-network</name>
+										</network>
+										<wait>
+											<log>mysqld: ready for connections</log>
+											<time>20000</time>
+										</wait>
+										<dependsOn>
+											<container>mysql</container>
+										</dependsOn>
 									</run>
 								</image>
 
@@ -256,6 +264,11 @@
 									<alias>mysql</alias>
 									<name>mysql:5.6</name>
 									<run>
+										<network>
+											<mode>custom</mode>
+											<name>my-network</name>
+											<alias>mysqldb</alias>
+										</network>
 										<wait>
 											<log>mysqld: ready for connections</log>
 											<time>20000</time>
@@ -266,25 +279,23 @@
 											<MYSQL_USER>user</MYSQL_USER>
 											<MYSQL_PASSWORD>password</MYSQL_PASSWORD>
 										</env>
-										<ports>
-											<port>3306:3306</port>
-										</ports>
 									</run>
 								</image>
 							</images>
 						</configuration>
 						<executions>
 							<execution>
-								<id>docker-start</id>
-								<phase>pre-integration-test</phase>
+								<id>docker-build-image</id>
+								<phase>package</phase>
 								<goals>
-									<goal>start</goal>
+									<goal>build</goal>
 								</goals>
 							</execution>
 							<execution>
-								<id>docker-stop</id>
-								<phase>post-integration-test</phase>
+								<id>docker-verify</id>
+								<phase>verify</phase>
 								<goals>
+									<goal>start</goal>
 									<goal>stop</goal>
 								</goals>
 							</execution>
