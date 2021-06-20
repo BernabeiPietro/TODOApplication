@@ -282,7 +282,7 @@
 													<port>${db.docker.port}</port>
 												</ports>
 											</tcp>
-											<time>20000</time>
+											<time>100000</time>
 										</wait>
 										<env>
 											<MYSQL_ROOT_PASSWORD>password</MYSQL_ROOT_PASSWORD>
