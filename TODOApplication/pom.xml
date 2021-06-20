@@ -19,6 +19,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<db.docker.dns>mysqldb</db.docker.dns>
+		<db.docker.port>3306</db.docker.port>
+		<JDBC-URL>jdbc:mysql://${db.docker.dns}:${db.docker.port}/db_example?createDatabaseIfNotExist=true</JDBC-URL>
+
 	</properties>
 
 	<dependencies>
@@ -187,8 +191,12 @@
 							<name>mysql:5.6</name>
 							<run>
 								<wait>
-									<log>mysqld: ready for connections</log>
-									<time>20000</time>
+									<tcp>
+										<ports>
+											<port>3306</port>
+										</ports>
+									</tcp>
+									<time>100000</time>
 								</wait>
 								<env>
 									<MYSQL_ROOT_PASSWORD>password</MYSQL_ROOT_PASSWORD>
@@ -246,14 +254,13 @@
 										</args>
 									</build>
 									<run>
+										<ports>
+											<port>8080:8080</port>
+										</ports>
 										<network>
 											<mode>custom</mode>
 											<name>my-network</name>
 										</network>
-										<wait>
-											<log>mysqld: ready for connections</log>
-											<time>20000</time>
-										</wait>
 										<dependsOn>
 											<container>mysql</container>
 										</dependsOn>
@@ -267,10 +274,14 @@
 										<network>
 											<mode>custom</mode>
 											<name>my-network</name>
-											<alias>mysqldb</alias>
+											<alias>${db.docker.dns}</alias>
 										</network>
 										<wait>
-											<log>mysqld: ready for connections</log>
+											<tcp>
+												<ports>
+													<port>${db.docker.port}</port>
+												</ports>
+											</tcp>
 											<time>20000</time>
 										</wait>
 										<env>
