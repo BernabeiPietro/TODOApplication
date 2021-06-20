@@ -11,8 +11,9 @@ jobs:
       matrix:
         include:
         - java: 8
-          additional-maven-args: 
-            -Pcoveralls
+          additional-maven-args:
+            
+            -Pcoveralls, docker
             -DrepoToken=$COVERALLS_REPO_TOKEN 
             -DpullRequest=${{ github.event.pull_request.number }} 
             coveralls:report
