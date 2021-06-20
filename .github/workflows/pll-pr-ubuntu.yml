@@ -22,7 +22,7 @@ jobs:
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v1
       with:
-        java-version: ${{ matrix.java }}s
+        java-version: ${{ matrix.java }}
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
