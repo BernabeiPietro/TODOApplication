@@ -5,12 +5,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      workdir: TODOApplication
     strategy:
       matrix:
         include:
         - java: 8
           additional-maven-args: 
-            -Pjacoco -DrepoToken=$COVERALLS_REPO_TOKEN 
+            -Pcoveralls
+            -DrepoToken=$COVERALLS_REPO_TOKEN 
             -DpullRequest=${{ github.event.pull_request.number }} 
             coveralls:report
     name: Build with Java ${{ matrix.java }} on Linux
@@ -19,7 +22,7 @@ jobs:
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v1
       with:
-        java-version: ${{ matrix.java }}
+        java-version: ${{ matrix.java }}s
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
@@ -29,13 +32,13 @@ jobs:
     - name: Build with Maven
       run: 
         mvn verify ${{ matrix.additional-maven-args }}
-      working-directory: TODOApplication
+      working-directory: ${{env.workdir}}
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
     - name: Generate JUnit Report
       run: 
         mvn surefire-report:report-only site:site -DgenerateReports=false #create reports as for test
-      working-directory: TODOApplication
+      working-directory: ${{env.workdir}}
       if: ${{failure()}}
     - name: Archive Junit Report
       uses: actions/upload-artifact@v2
