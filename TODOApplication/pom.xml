@@ -186,6 +186,8 @@
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>0.34.1</version>
 				<configuration>
+					<showLogs>true</showLogs>
+					<verbose>build</verbose>
 					<images>
 						<image>
 							<name>mysql:5.6</name>
@@ -193,7 +195,7 @@
 								<wait>
 									<tcp>
 										<ports>
-											<port>3306</port>
+											<port>${db.docker.port}</port>
 										</ports>
 									</tcp>
 									<time>100000</time>
@@ -205,7 +207,7 @@
 									<MYSQL_PASSWORD>password</MYSQL_PASSWORD>
 								</env>
 								<ports>
-									<port>3306:3306</port>
+									<port>${db.docker.port}:${db.docker.port}</port>
 								</ports>
 							</run>
 						</image>
@@ -256,7 +258,6 @@
 									<run>
 										<ports>
 											<port>8080:8080</port>
-											<port>${db.docker.port}:${db.docker.port}</port>
 										</ports>
 										<network>
 											<mode>custom</mode>
