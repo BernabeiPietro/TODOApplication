@@ -256,6 +256,7 @@
 									<run>
 										<ports>
 											<port>8080:8080</port>
+											<port>${db.docker.port}:${db.docker.port}</port>
 										</ports>
 										<network>
 											<mode>custom</mode>
