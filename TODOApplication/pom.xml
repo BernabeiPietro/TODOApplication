@@ -19,7 +19,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<db.docker.dns>mysqldb</db.docker.dns>
+		<db.docker.dns>localhost</db.docker.dns>
 		<db.docker.port>3306</db.docker.port>
 		<JDBC-URL>jdbc:mysql://${db.docker.dns}:${db.docker.port}/db_example?createDatabaseIfNotExist=true</JDBC-URL>
 
