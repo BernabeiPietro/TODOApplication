@@ -22,7 +22,11 @@
 		<db.docker.dns>localhost</db.docker.dns>
 		<db.docker.port>3306</db.docker.port>
 		<JDBC-URL>jdbc:mysql://${db.docker.dns}:${db.docker.port}/db_example?createDatabaseIfNotExist=true</JDBC-URL>
-
+		<sonar.junit.reportPaths>
+			${project.build.directory}/surefire-reports,
+			${project.build.directory}/failsafe-reports
+		</sonar.junit.reportPaths>
+		<sonar.projectKey>BernabeiPietro_todo-application</sonar.projectKey>
 	</properties>
 
 	<dependencies>
