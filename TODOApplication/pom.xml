@@ -19,6 +19,17 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<db.docker.dns>localhost</db.docker.dns>
+		<db.docker.port>3306</db.docker.port>
+		<JDBC-URL>jdbc:mysql://${db.docker.dns}:${db.docker.port}/db_example?createDatabaseIfNotExist=true</JDBC-URL>
+		<sonar.coverage.exclusions>
+			**/TodoApplication.*
+		</sonar.coverage.exclusions>
+		<sonar.junit.reportPaths>
+			${project.build.directory}/surefire-reports,
+			${project.build.directory}/failsafe-reports
+		</sonar.junit.reportPaths>
+		<sonar.projectKey>BernabeiPietro_todo-application</sonar.projectKey>
 	</properties>
 
 	<dependencies>
@@ -69,6 +80,15 @@
 	</dependencies>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>3.8.0.2131</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<artifactId>maven-surefire-report-plugin</artifactId>
@@ -86,6 +106,12 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.6</version>
+				<configuration>
+					<excludes>
+						<exclude>**/TodoApplication.*</exclude>
+						
+					</excludes>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -112,10 +138,6 @@
 				</dependencies>
 			</plugin>
 			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.1</version>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>3.0.0</version>
@@ -137,16 +159,26 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.22.1</version>
+				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<systemPropertyVariables>
-						<mysql.port>${mysql.mapped.port}</mysql.port>
-					</systemPropertyVariables>
+					<includes>
+						<include>**/*Test.java</include>
+					</includes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+
 				<executions>
 					<execution>
 						<id>default-it</id>
+						<configuration>
+							<includes>
+								<include>**/*ApplicationTests.java</include>
+								<include>**/*IT.java</include>
+							</includes>
+						</configuration>
 						<goals>
 							<goal>integration-test</goal>
 							<goal>verify</goal>
@@ -161,6 +193,8 @@
 						<configuration>
 							<excludes>
 								<exclude>**/*IT.java</exclude>
+								<exclude>**/*ApplicationTests.java</exclude>
+
 							</excludes>
 							<includes>
 								<include>**/*E2E.java</include>
@@ -169,50 +203,76 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.34.1</version>
+				<configuration>
+					<showLogs>true</showLogs>
+					<verbose>build</verbose>
+					<images>
+						<image>
+							<name>mysql:5.6</name>
+							<run>
+								<wait>
+									<tcp>
+										<ports>
+											<port>${db.docker.port}</port>
+										</ports>
+									</tcp>
+									<time>100000</time>
+								</wait>
+								<env>
+									<MYSQL_ROOT_PASSWORD>password</MYSQL_ROOT_PASSWORD>
+									<MYSQL_DATABASE>db_example</MYSQL_DATABASE>
+									<MYSQL_USER>user</MYSQL_USER>
+									<MYSQL_PASSWORD>password</MYSQL_PASSWORD>
+								</env>
+								<ports>
+									<port>${db.docker.port}:${db.docker.port}</port>
+								</ports>
+							</run>
+						</image>
+					</images>
+				</configuration>
+				<executions>
+					<execution>
+						<id>docker-start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>docker-stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
-		<profile>
-			<id>docker</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>docker-maven-plugin</artifactId>
-						<version>0.34.1</version>
-						<configuration>
-							<images>
-								<image>
-									<name>mysql-server:5.6</name>
-									<run>
-										<ports>
-											<port>mysql.mapped.port:27017</port>
-										</ports>
-									</run>
-								</image>
-							</images>
-						</configuration>
-						<executions>
-							<execution>
-								<id>docker-start</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>start</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>docker-stop</id>
-								<phase>post-integration-test</phase>
-								<goals>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+		<!-- <profile> <id>docker</id> <build> <plugins> <plugin> <groupId>io.fabric8</groupId> 
+			<artifactId>docker-maven-plugin</artifactId> <version>0.34.1</version> <configuration> 
+			<autoCreateCustomNetworks>true</autoCreateCustomNetworks> <showLogs>true</showLogs> 
+			<verbose>build</verbose> <images> <image> <name>todoapp</name> <build> <contextDir>${project.basedir}</contextDir> 
+			<args> <jarToCopy>${project.artifactId}-${project.version}.jar</jarToCopy> 
+			</args> </build> <run> <ports> <port>8080:8080</port> </ports> <network> 
+			<mode>custom</mode> <name>my-network</name> </network> <dependsOn> <container>mysql</container> 
+			</dependsOn> </run> </image> <image> <alias>mysql</alias> <name>mysql:5.6</name> 
+			<run> <network> <mode>custom</mode> <name>my-network</name> <alias>${db.docker.dns}</alias> 
+			</network> <wait> <tcp> <ports> <port>${db.docker.port}</port> </ports> </tcp> 
+			<time>100000</time> </wait> <env> <MYSQL_ROOT_PASSWORD>password</MYSQL_ROOT_PASSWORD> 
+			<MYSQL_DATABASE>db_example</MYSQL_DATABASE> <MYSQL_USER>user</MYSQL_USER> 
+			<MYSQL_PASSWORD>password</MYSQL_PASSWORD> </env> </run> </image> </images> 
+			</configuration> <executions> <execution> <id>docker-build-image</id> <phase>package</phase> 
+			<goals> <goal>build</goal> </goals> </execution> <execution> <id>docker-verify</id> 
+			<phase>verify</phase> <goals> <goal>start</goal> <goal>stop</goal> </goals> 
+			</execution> </executions> </plugin> </plugins> </build> </profile> -->
 		<profile>
 			<id>jacoco</id>
 			<build>
@@ -221,6 +281,32 @@
 						<!-- configured in pluginManagement -->
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>coveralls</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- configured in pluginManagement -->
+						<!-- JaCoCo report is required by coveralls-maven-plugin -->
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<!-- configured in pluginManagement -->
+						<groupId>org.eluder.coveralls</groupId>
+						<artifactId>coveralls-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
