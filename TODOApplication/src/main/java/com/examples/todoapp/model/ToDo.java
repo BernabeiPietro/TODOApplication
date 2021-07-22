@@ -4,19 +4,34 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.JoinColumn ;
 @Entity
 public class ToDo {
 
+	public ToDo() {
+		super();
+	}
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@ElementCollection
+	@CollectionTable(name = "todo_mapping", joinColumns = {@JoinColumn(name = "todo_map_id", referencedColumnName = "id") })
+	@MapKeyColumn(name = "todo_action") /* where keys are stored*/
+	@Column(name = "doit") //where value are stored
 	private Map<String, Boolean> toDo;
+	@Temporal(TemporalType.TIME)
 	private Date date;
 	private Long idOfUser;
 
