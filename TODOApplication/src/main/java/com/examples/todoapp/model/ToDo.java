@@ -1,6 +1,6 @@
 package com.examples.todoapp.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 
@@ -31,11 +31,11 @@ public class ToDo {
 	@MapKeyColumn(name = "todo_action") /* where keys are stored*/
 	@Column(name = "doit") //where value are stored
 	private Map<String, Boolean> toDo;
-	@Temporal(TemporalType.TIME)
-	private Date date;
+	@Column(name = "local_date_time", columnDefinition = "TIMESTAMP")
+	private LocalDateTime date;
 	private Long idOfUser;
 
-	public ToDo(Long id, Long idOfUser, Map<String, Boolean> toDo, Date date) {
+	public ToDo(Long id, Long idOfUser, Map<String, Boolean> toDo, LocalDateTime date) {
 		super();
 		this.id = id;
 		this.toDo = toDo;
@@ -59,11 +59,11 @@ public class ToDo {
 		this.id = id;
 	}
 
-	public Date getDate() {
+	public LocalDateTime getLocalDateTime() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setLocalDateTime(LocalDateTime date) {
 		this.date = date;
 	}
 
