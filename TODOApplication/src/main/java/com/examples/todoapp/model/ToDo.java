@@ -2,7 +2,9 @@ package com.examples.todoapp.model;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -15,6 +17,7 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.JoinColumn ;
+import javax.persistence.ManyToOne;
 @Entity
 public class ToDo {
 
@@ -33,9 +36,11 @@ public class ToDo {
 	private Map<String, Boolean> toDo;
 	@Column(name = "local_date_time", columnDefinition = "TIMESTAMP")
 	private LocalDateTime date;
-	private Long idOfUser;
+	@ManyToOne
+	@JoinColumn(name="Id_of_user")
+	private User idOfUser;
 
-	public ToDo(Long id, Long idOfUser, Map<String, Boolean> toDo, LocalDateTime date) {
+	public ToDo(Long id, User idOfUser, Map<String, Boolean> toDo, LocalDateTime date) {
 		super();
 		this.id = id;
 		this.toDo = toDo;
@@ -43,11 +48,13 @@ public class ToDo {
 		this.idOfUser = idOfUser;
 	}
 
-	public Map<String, Boolean> getToDo() {
+	public  Stream<Entry<String, Boolean>> getToDoStream() {
+		return toDo.entrySet().stream();
+	}
+	public  Map<String,Boolean> getToDo() {
 		return toDo;
 	}
-
-	public void setToDo(Map<String, Boolean> toDo) {
+	void setToDo(Map<String, Boolean> toDo) {
 		this.toDo = toDo;
 	}
 
@@ -55,7 +62,7 @@ public class ToDo {
 		return id;
 	}
 
-	public void setId(Long id) {
+	void setId(Long id) {
 		this.id = id;
 	}
 
@@ -65,6 +72,18 @@ public class ToDo {
 
 	public void setLocalDateTime(LocalDateTime date) {
 		this.date = date;
+	}
+
+
+	public void addToDoAction(String action,Boolean doIt) {
+		this.toDo.put(action, doIt);
+	}
+	public User getIdOfUser() {
+		return idOfUser;
+	}
+
+	public void setIdOfUser(User idOfUser) {
+		this.idOfUser = idOfUser;
 	}
 
 	@Override
@@ -82,5 +101,6 @@ public class ToDo {
 		return Objects.equals(date, other.date) && Objects.equals(id, other.id)
 				&& Objects.equals(idOfUser, other.idOfUser) && Objects.equals(toDo, other.toDo);
 	}
+
 
 }

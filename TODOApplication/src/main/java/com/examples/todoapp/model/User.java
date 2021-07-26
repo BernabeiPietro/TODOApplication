@@ -1,18 +1,27 @@
 package com.examples.todoapp.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
  // This tells Hibernate to make a table out of this class
+@Entity
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	
+	@OneToMany(mappedBy="idOfUser")
+	private List<ToDo> todo;
 
 	public User() {
 		super();
@@ -28,13 +37,14 @@ public class User {
 		this.id = id;
 		this.name = name;
 		this.email = email;
+		this.todo=new ArrayList<ToDo>();
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	void setId(Long id) {
 		this.id = id;
 	}
 
@@ -50,13 +60,28 @@ public class User {
 		return email;
 	}
 
+	public Stream<ToDo>  getToDoStream() {
+		return todo.stream();
+	}
+	public List<ToDo> getToDo()
+	{
+		return todo;
+	}
+	public void addToDo(ToDo td) {
+		todo.add(td);
+	}
+
+	public void setTodo(List<ToDo> todo) {
+		this.todo = todo;
+	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(email, id, name);
+		return Objects.hash(email, id, name, todo);
 	}
 
 	@Override
@@ -66,7 +91,9 @@ public class User {
 		if (!(obj instanceof User))
 			return false;
 		User other = (User) obj;
-		return Objects.equals(email, other.email) && Objects.equals(id, other.id) && Objects.equals(name, other.name);
+		return Objects.equals(email, other.email) && Objects.equals(id, other.id) && Objects.equals(name, other.name)
+				&& Objects.equals(todo, other.todo);
 	}
+
 
 }
