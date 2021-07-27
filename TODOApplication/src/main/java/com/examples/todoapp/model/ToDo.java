@@ -48,9 +48,6 @@ public class ToDo {
 		this.idOfUser = idOfUser;
 	}
 
-	public  Stream<Entry<String, Boolean>> getToDoStream() {
-		return toDo.entrySet().stream();
-	}
 	public  Map<String,Boolean> getToDo() {
 		return toDo;
 	}

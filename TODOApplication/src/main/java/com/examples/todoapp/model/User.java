@@ -44,7 +44,7 @@ public class User {
 		return id;
 	}
 
-	void setId(Long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -60,9 +60,6 @@ public class User {
 		return email;
 	}
 
-	public Stream<ToDo>  getToDoStream() {
-		return todo.stream();
-	}
 	public List<ToDo> getToDo()
 	{
 		return todo;
